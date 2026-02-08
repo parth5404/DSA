@@ -8,13 +8,18 @@ public:
             return 0;
         if (vis[i][j] == 1 || grid[i][j] == 0)
             return 0;
+
         vis[i][j] = 1;
+
+        int sum = grid[i][j];
         int best = 0;
+
         for (int k = 0; k < 4; k++) {
             best = max(best, dfs(grid, i + dir[k].first, j + dir[k].second));
         }
+
         vis[i][j] = 0;
-        return grid[i][j] + best;
+        return sum + best;
     }
 
     int getMaximumGold(vector<vector<int>>& grid) {
