@@ -1,163 +1,80 @@
-// test today revisit tomorrow
-
-
-struct LazyTag {
-    int to_add = 0;
-
-    LazyTag& operator+=(const LazyTag& other) {
-        this->to_add += other.to_add;
-        return *this;
-    }
-
-    bool has_tag() const { return to_add != 0; }
-
-    void clear() { to_add = 0; }
-};
-
-struct SegmentTreeNode {
-    int min_value = 0;
-    int max_value = 0;
-    // int data = 0; // only leaf nodes are used, this question does not require
-    // it.
-    LazyTag lazy_tag;
-};
-
-class SegmentTree {
-public:
+class Solution {
+    vector<int> segMin, segMax, lazy;
     int n;
-    vector<SegmentTreeNode> tree;
+    void propagate(int i, int l, int r) {
+        if (lazy[i] != 0) {
+            segMin[i] += lazy[i];
+            segMax[i] += lazy[i];
 
-    SegmentTree(const vector<int>& data) : n(data.size()) {
-        tree.resize(n * 4 + 1);
-        build(data, 1, n, 1);
-    }
-
-    void add(int l, int r, int val) {
-        LazyTag tag{val};
-        update(l, r, tag, 1, n, 1);
-    }
-
-    int find_last(int start, int val) {
-        if (start > n) {
-            return -1;
-        }
-        return find(start, n, val, 1, n, 1);
-    }
-
-private:
-    inline void apply_tag(int i, const LazyTag& tag) {
-        tree[i].min_value += tag.to_add;
-        tree[i].max_value += tag.to_add;
-        tree[i].lazy_tag += tag;
-    }
-
-    inline void pushdown(int i) {
-        if (tree[i].lazy_tag.has_tag()) {
-            LazyTag tag = tree[i].lazy_tag;
-            apply_tag(i << 1, tag);
-            apply_tag(i << 1 | 1, tag);
-            tree[i].lazy_tag.clear();
+            if (l != r) {
+                lazy[2 * i + 1] += lazy[i];
+                lazy[2 * i + 2] += lazy[i];
+            }
+            lazy[i] = 0;
         }
     }
+    // Range add val to [start, end]
+    void updateRange(int start, int end, int i, int l, int r, int val) {
+        propagate(i, l, r); // make sure to propagate before hand
 
-    inline void pushup(int i) {
-        tree[i].min_value =
-            std::min(tree[i << 1].min_value, tree[i << 1 | 1].min_value);
-        tree[i].max_value =
-            std::max(tree[i << 1].max_value, tree[i << 1 | 1].max_value);
-    }
+        if (l > end || r < start)
+            return;
 
-    void build(const vector<int>& data, int l, int r, int i) {
-        if (l == r) {
-            tree[i].min_value = tree[i].max_value = data[l - 1];
+        //[start...end[ is fully inside range of current node [l..r]
+        if (l >= start && r <= end) {
+            lazy[i] += val;
+            propagate(i, l, r);
             return;
         }
 
-        int mid = l + ((r - l) >> 1);
-        build(data, l, mid, i << 1);
-        build(data, mid + 1, r, i << 1 | 1);
+        int mid = (l + r) / 2;
+        updateRange(start, end, 2 * i + 1, l, mid, val);
+        updateRange(start, end, 2 * i + 2, mid + 1, r, val);
 
-        pushup(i);
+        segMin[i] = min(segMin[2 * i + 1], segMin[2 * i + 2]);
+        segMax[i] = max(segMax[2 * i + 1], segMax[2 * i + 2]);
     }
+    int findLeftMostZero(int i, int l, int r) {
+        propagate(i, l, r);
 
-    void update(int target_l, int target_r, const LazyTag& tag, int l, int r,
-                int i) {
-        if (target_l <= l && r <= target_r) {
-            apply_tag(i, tag);
-            return;
-        }
-
-        pushdown(i);
-        int mid = l + ((r - l) >> 1);
-        if (target_l <= mid) update(target_l, target_r, tag, l, mid, i << 1);
-        if (target_r > mid)
-            update(target_l, target_r, tag, mid + 1, r, i << 1 | 1);
-        pushup(i);
-    }
-
-    int find(int target_l, int target_r, int val, int l, int r, int i) {
-        if (tree[i].min_value > val || tree[i].max_value < val) {
+        if (segMin[i] > 0 || segMax[i] < 0) {
             return -1;
         }
 
-        // according to the Intermediate Value Theorem, there must be a solution
-        // within this interval.
         if (l == r) {
             return l;
         }
 
-        pushdown(i);
-        int mid = l + ((r - l) >> 1);
+        int mid = l + (r - l) / 2;
+        int leftResult = findLeftMostZero(2 * i + 1, l, mid);
+        if (leftResult != -1)
+            return leftResult;
 
-        // target_l is definitely less than or equal to r (=n)
-        if (target_r >= mid + 1) {
-            int res = find(target_l, target_r, val, mid + 1, r, i << 1 | 1);
-            if (res != -1) return res;
-        }
-
-        if (l <= target_r && mid >= target_l) {
-            return find(target_l, target_r, val, l, mid, i << 1);
-        }
-
-        return -1;
+        return findLeftMostZero(2 * i + 2, mid + 1, r);
     }
-};
 
-class Solution {
 public:
     int longestBalanced(vector<int>& nums) {
-        map<int, queue<int>> occurrences;
-        auto sgn = [](int x) { return (x % 2) == 0 ? 1 : -1; };
-
-        int len = 0;
-        vector<int> prefix_sum(nums.size(), 0);
-
-        prefix_sum[0] = sgn(nums[0]);
-        occurrences[nums[0]].push(1);
-
-        for (int i = 1; i < nums.size(); i++) {
-            prefix_sum[i] = prefix_sum[i - 1];
-            auto& occ = occurrences[nums[i]];
-            if (occ.empty()) {
-                prefix_sum[i] += sgn(nums[i]);
-            }
-            occ.push(i + 1);
-        }
-
-        SegmentTree seg(prefix_sum);
-
+        this->n = nums.size();
+        this->segMin.assign(4 * n, 0);
+        this->segMax.assign(4 * n, 0);
+        this->lazy.assign(4 * n, 0);
+        int ans = 0;
+        unordered_map<int, int> mp;
+        vector<int> vec(nums.size(), 0);
         for (int i = 0; i < nums.size(); i++) {
-            len = std::max(len, seg.find_last(i + len, 0) - i);
-
-            auto next_pos = nums.size() + 1;
-            occurrences[nums[i]].pop();
-            if (!occurrences[nums[i]].empty()) {
-                next_pos = occurrences[nums[i]].front();
+            int val = (nums[i] % 2 == 0) ? 1 : -1;
+            if (mp.count(nums[i])) {
+                int idx = mp[nums[i]];
+                updateRange(0, idx, 0, 0, n - 1, -val);
             }
+            updateRange(0, i, 0, 0, n - 1, val);
 
-            seg.add(i + 1, next_pos - 1, -sgn(nums[i]));
+            int l = findLeftMostZero(0, 0, n - 1);
+            if (l != -1)
+                ans = max(ans, i - l + 1);
+            mp[nums[i]] = i;
         }
-
-        return len;
+        return ans;
     }
 };
