@@ -10,8 +10,6 @@ public:
         }
 
         for (int i = 0; i < 3; i++) {
-            if (!ans.empty()) return; 
-
             if (str.empty() || str.back() != arr[i]) {
                 str.push_back(arr[i]);
                 bcK(n, k, str);
