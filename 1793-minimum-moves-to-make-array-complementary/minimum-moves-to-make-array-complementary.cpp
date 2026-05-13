@@ -11,14 +11,15 @@ public:
             int b = max(nums[i], nums[n - 1 - i]);
 
             diff[2] += 2;
-
-            diff[a + 1] -= 1;
+            diff[a + 1] -= 2;
+            diff[a + 1] += 1;
 
             diff[a + b] -= 1;
 
             diff[a + b + 1] += 1;
 
-            diff[b + limit + 1] += 1;
+            diff[b + limit + 1] -= 1;
+            diff[b + limit + 1] += 2;
         }
 
         int ans = INT_MAX;
