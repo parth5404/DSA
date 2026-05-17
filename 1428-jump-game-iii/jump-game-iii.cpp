@@ -1,23 +1,20 @@
 class Solution {
 public:
+    bool dfs(vector<int>& arr, int idx, vector<int>& vis) {
+
+        if (idx < 0 || idx >= arr.size() || vis[idx])
+            return false;
+
+        if (arr[idx] == 0)
+            return true;
+
+        vis[idx] = 1;
+
+        return dfs(arr, idx + arr[idx], vis) || dfs(arr, idx - arr[idx], vis);
+    }
+
     bool canReach(vector<int>& arr, int start) {
         vector<int> vis(arr.size(), 0);
-        queue<int> q;
-        q.push(start);
-
-        while (!q.empty()) {
-            int top = q.front();
-            cout<<top<<endl;
-            q.pop();
-            vis[top] = 1;
-            if (arr[top] == 0)
-                return true;
-            if (top + arr[top] < arr.size() && vis[top + arr[top]] == 0)
-                q.push(top + arr[top]);
-            if (top - arr[top] >= 0 && vis[top - arr[top]] == 0) {
-                q.push(top - arr[top]);
-            }
-        }
-        return false;
+        return dfs(arr, start, vis);
     }
 };
