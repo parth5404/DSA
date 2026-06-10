@@ -47,6 +47,16 @@ public:
             pq.push({val, i, n});
         }
         long long ans = 0;
+        // if (pq.size() >= k) {
+        //     while (k--) {
+        //         auto [val, l, r] = pq.top();
+        //         ans += val;
+        //         pq.pop();
+        //         // long long val1 = maxST->Query(l, r - 1, 0, n, 0) -
+        //         //                  minSt->Query(l, r - 1, 0, n, 0);
+        //         // pq.push({val1, l, r - 1});
+        //     }
+        // } else {
         while (k--) {
             auto [val, l, r] = pq.top();
             ans += val;
@@ -55,6 +65,8 @@ public:
                              minSt->Query(l, r - 1, 0, n, 0);
             pq.push({val1, l, r - 1});
         }
+        //}
+
         return ans;
     }
 };
