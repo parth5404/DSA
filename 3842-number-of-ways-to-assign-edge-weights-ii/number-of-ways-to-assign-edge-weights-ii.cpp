@@ -60,7 +60,7 @@ public:
         LOG = (log(n) / log(2)) + 1;
         up = vector<vector<int>>(n + 1, vector<int>(LOG + 1, 0));
         dfs(1, 0, mp, depth);
-        for (int node = 1; node <= n; node++) {
+        for (int node = 2; node <= n; node++) {
             for (int i = 1; i <= LOG; i++) {
                 up[node][i] = up[up[node][i - 1]][i - 1];
             }
