@@ -1,66 +1,3 @@
-class LCA {
-public:
-    LCA(const vector<vector<int>>& edges, const int root = 1) {
-        n = edges.size() + 1;
-        m = (log(n) / log(2)) + 1;
-        e.resize(n + 1);
-        d.resize(n + 1);
-        f.resize(n + 1, vector<int>(m, 0));
-        for (auto& edge : edges) {
-            int u = edge[0];
-            int v = edge[1];
-            e[u].push_back(v);
-            e[v].push_back(u);
-        }
-        dfs(root, 0);
-        for (int i = 1; i < m; i++) {
-            for (int x = 1; x <= n; x++) {
-                f[x][i] = f[f[x][i - 1]][i - 1];
-            }
-        }
-    }
-    void dfs(int x, int fa) {
-        f[x][0] = fa;
-        for (auto& y : e[x]) {
-            if (y == fa) {
-                continue;
-            }
-            d[y] = d[x] + 1;
-            dfs(y, x);
-        }
-    }
-
-    int lca(int x, int y) {
-        if (d[x] > d[y]) {
-            swap(x, y);
-        }
-        for (int i = m - 1; i >= 0; i--) {
-            if (d[x] <= d[f[y][i]]) {
-                y = f[y][i];
-            }
-        }
-        if (x == y) {
-            return x;
-        }
-        for (int i = m - 1; i >= 0; i--) {
-            if (f[y][i] != f[x][i]) {
-                x = f[x][i];
-                y = f[y][i];
-            }
-        }
-        return f[x][0];
-    }
-
-    int dis(int x, int y) { return d[x] + d[y] - d[lca(x, y)] * 2; }
-
-private:
-    int n;
-    int m;
-    vector<int> d;
-    vector<vector<int>> e;
-    vector<vector<int>> f;
-};
-
 const int MOD = 1e9 + 7;
 const int N = 100010;
 int p2[N];
@@ -71,21 +8,74 @@ auto init = [] {
     }
     return 0;
 }();
-
 class Solution {
 public:
-    vector<int> assignEdgeWeights(vector<vector<int>>& edges,
-                                  vector<vector<int>>& queries) {
-        LCA lca(edges, 1);
-        int m = queries.size();
-        vector<int> res(m);
-        for (int i = 0; i < m; i++) {
-            int x = queries[i][0];
-            int y = queries[i][1];
-            if (x != y) {
-                res[i] = p2[lca.dis(x, y) - 1];
+    int LOG = 0;
+    vector<vector<int>> up;
+    void dfs(int child, int parent, unordered_map<int, vector<int>>& mp,
+             vector<int>& depth) {
+        up[child][0] = parent;
+        for (auto it : mp[child]) {
+            if (it == parent)
+                continue;
+            depth[it] = max(depth[it], 1 + depth[child]);
+            dfs(it, child, mp, depth);
+        }
+    }
+    int lca(int x, int y, vector<int>& d) {
+        if (d[x] > d[y]) {
+            swap(x, y);
+        }
+        for (int i = LOG - 1; i >= 0; i--) {
+            if (d[x] <= d[up[y][i]]) {
+                y = up[y][i];
             }
         }
-        return res;
+        if (x == y) {
+            return x;
+        }
+        for (int i = LOG - 1; i >= 0; i--) {
+            if (up[y][i] != up[x][i]) {
+                x = up[x][i];
+                y = up[y][i];
+            }
+        }
+        return up[x][0];
+    }
+    int dis(int x, int y, vector<int>& d) {
+        return d[x] + d[y] - d[lca(x, y, d)] * 2;
+    }
+    vector<int> assignEdgeWeights(vector<vector<int>>& edges,
+                                  vector<vector<int>>& queries) {
+        unordered_map<int, vector<int>> mp;
+        int n = edges.size();
+        for (auto it : edges) {
+            int u = it[0];
+            int v = it[1];
+            mp[u].push_back(v);
+            mp[v].push_back(u);
+            n = max({n, u, v});
+        }
+        vector<int> depth(n + 1, 0);
+        LOG = (log(n) / log(2)) + 1;
+        up = vector<vector<int>>(n + 1, vector<int>(LOG + 1, 0));
+        dfs(1, 0, mp, depth);
+        for (int node = 1; node <= n; node++) {
+            for (int i = 1; i <= LOG; i++) {
+                up[node][i] = up[up[node][i - 1]][i - 1];
+            }
+        }
+        vector<int> ans;
+        for (auto q : queries) {
+            int p = q[0];
+            int k = q[1];
+            if (p!=k) {
+                ans.push_back(p2[dis(p,k,depth)-1]);
+            }else{
+                ans.push_back(0);
+            }
+        }
+
+        return ans;
     }
 };
