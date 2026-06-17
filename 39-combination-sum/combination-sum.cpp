@@ -11,10 +11,13 @@ public:
                 ds.push_back(nums[i]);
                 solve(nums, i, ds, sum + nums[i], tar);
                 ds.pop_back();
+            } else {
+                break;
             }
         }
     }
     vector<vector<int>> combinationSum(vector<int>& nums, int target) {
+        sort(nums.begin(), nums.end());
         vector<int> ds;
         solve(nums, 0, ds, 0, target);
         return arr;
