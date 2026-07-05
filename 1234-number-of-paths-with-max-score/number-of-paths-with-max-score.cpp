@@ -9,9 +9,7 @@ public:
         if (i == 0 && j == 0) {
             return {0, 1};
         }
-        if (dp[i][j][0] != -1 
-        //&& dp[i][j][1] != 0
-        ) {
+        if (dp[i][j][0] != -1) {
             return dp[i][j];
         }
         array<int, 2> ans = {0, 0};
@@ -21,9 +19,22 @@ public:
             if (x >= 0 && y >= 0 && board[x][y] != 'X') {
                 if (board[x][y] >= '1' && board[x][y] <= '9') {
                     int val = board[x][y] - '0';
-                    ans[0] = max(ans[0], val + dfs(board, x, y)[0]);
+                    if (ans[0] < val + dfs(board, x, y)[0]) {
+                        ans[0] = max(ans[0], val + dfs(board, x, y)[0]);
+                        ans[1] = (dfs(board, x, y)[1]) % MOD;
+                    } else if (ans[0] == val + dfs(board, x, y)[0]) {
+                        ans[0] = max(ans[0], val + dfs(board, x, y)[0]);
+                        ans[1] = (ans[1] + dfs(board, x, y)[1]) % MOD;
+                    }
                 } else if (x == 0 && y == 0) {
-                    ans[0] = max(ans[0], dfs(board, x, y)[0]);
+                    int val = 0;
+                    if (ans[0] < val + dfs(board, x, y)[0]) {
+                        ans[0] = max(ans[0], val + dfs(board, x, y)[0]);
+                        ans[1] = (dfs(board, x, y)[1]) % MOD;
+                    } else if (ans[0] == val + dfs(board, x, y)[0]) {
+                        ans[0] = max(ans[0], val + dfs(board, x, y)[0]);
+                        ans[1] = (ans[1] + dfs(board, x, y)[1]) % MOD;
+                    }
                 }
             }
         }
@@ -80,6 +91,6 @@ public:
         }
         if (ways[0][0] == 0)
             return {0, 0};
-        return {dfs(board, n - 1, n - 1)[0], ways[0][0]};
+        return {dfs(board, n - 1, n - 1)[0], dfs(board, n - 1, n - 1)[1]};
     }
 };
