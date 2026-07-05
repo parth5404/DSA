@@ -23,7 +23,7 @@ public:
                         ans[0] = max(ans[0], val + dfs(board, x, y)[0]);
                         ans[1] = (dfs(board, x, y)[1]) % MOD;
                     } else if (ans[0] == val + dfs(board, x, y)[0]) {
-                        ans[0] = max(ans[0], val + dfs(board, x, y)[0]);
+                        //ans[0] = max(ans[0], val + dfs(board, x, y)[0]);
                         ans[1] = (ans[1] + dfs(board, x, y)[1]) % MOD;
                     }
                 } else if (x == 0 && y == 0) {
@@ -32,7 +32,7 @@ public:
                         ans[0] = max(ans[0], val + dfs(board, x, y)[0]);
                         ans[1] = (dfs(board, x, y)[1]) % MOD;
                     } else if (ans[0] == val + dfs(board, x, y)[0]) {
-                        ans[0] = max(ans[0], val + dfs(board, x, y)[0]);
+                        //ans[0] = max(ans[0], val + dfs(board, x, y)[0]);
                         ans[1] = (ans[1] + dfs(board, x, y)[1]) % MOD;
                     }
                 }
