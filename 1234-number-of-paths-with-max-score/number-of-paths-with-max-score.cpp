@@ -4,41 +4,35 @@ public:
     int max_cnt = 0;
     vector<array<int, 2>> dir = {{-1, 0}, {0, -1}, {-1, -1}};
     int MOD = 1e9 + 7;
-    // vector<vector<int>> dp(102, vector<int>(102, 0));
-    // int dfs(vector<string>& board, int i, int j, int sum) {
-    //     if (i == 0 && j == 0) {
-    //         if (sum > max_sum) {
-    //             max_sum = sum;
-    //             max_cnt = 1;
-    //         } else if (sum == max_sum) {
-    //             max_cnt++;
-    //         }
-    //         //  cout << "Base Case" << endl;
-    //         return 0;
-    //     }
-    //     if (dp[i][j] != -1) {
-    //         return dp[i][j];
-    //     }
-    //     // for (auto it : dir) {
-    //     //     int x = i + it[0];
-    //     //     int y = j + it[1];
-    //     //     if (x >= 0 && y >= 0 && board[x][y] != 'X') {
-    //     //         if (board[x][y] >= '1' && board[x][y] <= '9') {
-    //     //             int val = (sum + board[x][y] - '0') % MOD;
-    //     //             // cout << x << " " << y << " " << board[x][y] << " "
-    //     <<
-    //     //             val
-    //     //             //      << endl;
-    //     //             dp[i] dfs(board, x, y, val);
-    //     //         } else if (x == 0 && y == 0) {
-    //     //             dfs(board, x, y, sum % MOD);
-    //     //         }
-    //     //     }
-    //     // }
-    //     dp[i][j] = val + max()
-    // }
+    vector<vector<array<int, 2>>> dp;
+    array<int, 2> dfs(vector<string>& board, int i, int j) {
+        if (i == 0 && j == 0) {
+            return {0, 1};
+        }
+        if (dp[i][j][0] != -1 
+        //&& dp[i][j][1] != 0
+        ) {
+            return dp[i][j];
+        }
+        array<int, 2> ans = {0, 0};
+        for (auto it : dir) {
+            int x = i + it[0];
+            int y = j + it[1];
+            if (x >= 0 && y >= 0 && board[x][y] != 'X') {
+                if (board[x][y] >= '1' && board[x][y] <= '9') {
+                    int val = board[x][y] - '0';
+                    ans[0] = max(ans[0], val + dfs(board, x, y)[0]);
+                } else if (x == 0 && y == 0) {
+                    ans[0] = max(ans[0], dfs(board, x, y)[0]);
+                }
+            }
+        }
+        return dp[i][j] = ans;
+    }
     vector<int> pathsWithMaxScore(vector<string>& board) {
         int n = board.size();
+        dp = vector<vector<array<int, 2>>>(
+            n + 1, vector<array<int, 2>>(n + 1, {-1, 0}));
         vector<vector<int>> scores(n, vector<int>(n, -1));
         vector<vector<int>> ways(n, vector<int>(n, 0));
         for (int i = n - 1; i >= 0; i--) {
@@ -51,7 +45,6 @@ public:
                 if (board[i][j] == 'X')
                     continue;
                 array<int, 2> arr = {-1, 0};
-                // diagonal
                 if (i + 1 < n && j + 1 < n && board[i + 1][j + 1] != 'X') {
                     if (scores[i + 1][j + 1] > arr[0]) {
                         arr[0] = scores[i + 1][j + 1];
@@ -60,7 +53,6 @@ public:
                         arr[1] = (arr[1] + ways[i + 1][j + 1]) % MOD;
                     }
                 }
-                // down
                 if (i + 1 < n && board[i + 1][j] != 'X') {
                     if (scores[i + 1][j] > arr[0]) {
                         arr[0] = scores[i + 1][j];
@@ -69,7 +61,6 @@ public:
                         arr[1] = (arr[1] + ways[i + 1][j]) % MOD;
                     }
                 }
-                // right
                 if (j + 1 < n && board[i][j + 1] != 'X') {
                     if (scores[i][j + 1] > arr[0]) {
                         arr[0] = scores[i][j + 1];
@@ -89,6 +80,6 @@ public:
         }
         if (ways[0][0] == 0)
             return {0, 0};
-        return {scores[0][0], ways[0][0]};
+        return {dfs(board, n - 1, n - 1)[0], ways[0][0]};
     }
 };
