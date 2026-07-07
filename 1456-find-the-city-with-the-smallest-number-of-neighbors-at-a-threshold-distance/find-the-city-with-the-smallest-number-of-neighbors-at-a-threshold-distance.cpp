@@ -35,10 +35,8 @@ public:
         int ans = INT_MAX;
         int ret_ans = INT_MAX;
         for (int i = 0; i < n; i++) {
-            if (ans > djs(n, k, i)) {
+            if (ans >= djs(n, k, i)) {
                 ans = djs(n, k, i);
-                ret_ans = i;
-            } else if (ans == djs(n, k, i)) {
                 ret_ans = i;
             }
         }
