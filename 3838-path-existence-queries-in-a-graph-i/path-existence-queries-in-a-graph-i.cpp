@@ -1,19 +1,59 @@
+class DSU{
+    vector<int> parent;
+
+public:
+    DSU(int n){
+        for(int i = 0; i < n; i++){
+            parent.push_back(i);
+        }
+    }
+
+    int find(int x){
+        if(parent[x] == x){
+            return x;
+        }
+
+        return parent[x] = find(parent[x]);
+    }
+
+    void merge(int x, int y){
+        int parX = find(x);
+        int parY = find(y);
+
+        parent[parX] = parY;
+    }
+};
+
 class Solution {
 public:
-    vector<bool> pathExistenceQueries(int n, vector<int>& nums, int maxDiff,
-                                      vector<vector<int>>& queries) {
-        vector<int> cmp(n);
+    vector<bool> pathExistenceQueries(int n, vector<int>& nums, int maxDiff, vector<vector<int>>& queries) {
+        priority_queue<pair<int, int>,vector<pair<int,int>>,greater<>> pq;
 
-        for (int i = 1; i < n; i++) {
-            cmp[i] = cmp[i - 1] + (nums[i] - nums[i - 1] > maxDiff);
+        for(int i = 0; i < n; i++){
+            pq.push({nums[i], i});
         }
 
-        vector<bool> res;
+        DSU dsu(n);
 
-        for (const auto &q : queries) {
-            res.push_back(cmp[q[0]] == cmp[q[1]]);
+        pair<int, int> temp = pq.top();
+
+        while(!pq.empty()){
+            pair<int, int> curr = pq.top();
+            pq.pop();
+
+            if(abs(temp.first - curr.first) <= maxDiff){
+                dsu.merge(temp.second, curr.second);
+            }
+
+            temp = curr;
         }
 
-        return res;
+        vector<bool> sol;
+
+        for(auto &it : queries){
+            sol.push_back(dsu.find(it[0]) == dsu.find(it[1]));
+        }
+
+        return sol;
     }
 };
