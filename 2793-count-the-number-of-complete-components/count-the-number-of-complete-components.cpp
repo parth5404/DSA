@@ -34,11 +34,11 @@ public:
                 int e1 = adj[i].size();
                 dfs(i, -1);
                 // e2 = e2 / 2;
-                if ((k2 * (k2 - 1)) / 2 != e2 / 2)
-                    continue;
-                if (k2 * e1 == e2) {
+                if ((k2 * (k2 - 1)) / 2 == e2 / 2)
                     cnt++;
-                }
+                // if (k2 * e1 == e2) {
+                //     cnt++;
+                // }
                 cout << k2 << " " << e2 << " " << e1 << endl;
                 // printvis();
                 // cout << endl;
