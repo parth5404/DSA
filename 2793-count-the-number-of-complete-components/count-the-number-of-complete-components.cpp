@@ -39,7 +39,7 @@ public:
                 // if (k2 * e1 == e2) {
                 //     cnt++;
                 // }
-                cout << k2 << " " << e2 << " " << e1 << endl;
+                //cout << k2 << " " << e2 << " " << e1 << endl;
                 // printvis();
                 // cout << endl;
             }
