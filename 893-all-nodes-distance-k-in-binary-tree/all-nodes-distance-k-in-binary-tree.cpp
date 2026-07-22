@@ -1,68 +1,50 @@
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
 class Solution {
 public:
-    vector<int> distanceK(TreeNode* root, TreeNode* target, int k) {
-        unordered_map<TreeNode*, TreeNode*> parent;
-        buildParent(parent, root);
-
-        unordered_set<TreeNode*> visited;
-        queue<TreeNode*> q;
-
-        q.push(target);
-        visited.insert(target);
-
-        while (!q.empty()) {
-            int size = q.size();
-
-            if (k == 0) break;
-            k--;
-
-            for (int i = 0; i < size; i++) {
-                TreeNode* curr = q.front();
-                q.pop();
-
-                if (curr->left && !visited.count(curr->left)) {
-                    q.push(curr->left);
-                    visited.insert(curr->left);
-                }
-
-                if (curr->right && !visited.count(curr->right)) {
-                    q.push(curr->right);
-                    visited.insert(curr->right);
-                }
-
-                if (parent.count(curr) && !visited.count(parent[curr])) {
-                    q.push(parent[curr]);
-                    visited.insert(parent[curr]);
-                }
-            }
+    vector<int> ans;
+    int find(TreeNode* root, TreeNode* target, int k) {
+        if (!root)
+            return -1;
+        if (root == target) {
+            dfs(root, k);
+            return 1;
         }
-
-        vector<int> ans;
-        while (!q.empty()) {
-            ans.push_back(q.front()->val);
-            q.pop();
+        int left = find(root->left, target, k);
+        if (left > 0) {
+            dfs(root->right, k - left - 1);
+            if (left == k)
+                ans.push_back(root->val);
+            return left + 1;
         }
-
-        return ans;
+        int right = find(root->right, target, k);
+        if (right > 0) {
+            dfs(root->left, k - right - 1);
+            if (right == k)
+                ans.push_back(root->val);
+            return right + 1;
+        }
+        return -1;
     }
-
-    void buildParent(unordered_map<TreeNode*, TreeNode*>& parent, TreeNode* root) {
-        queue<TreeNode*> q;
-        q.push(root);
-
-        while (!q.empty()) {
-            TreeNode* curr = q.front();
-            q.pop();
-
-            if (curr->left) {
-                parent[curr->left] = curr;
-                q.push(curr->left);
-            }
-
-            if (curr->right) {
-                parent[curr->right] = curr;
-                q.push(curr->right);
-            }
+    void dfs(TreeNode* root, int k) {
+        if (!root)
+            return;
+        if (k == 0) {
+            ans.push_back(root->val);
+            return;
         }
+        dfs(root->left, k - 1);
+        dfs(root->right, k - 1);
+    }
+    vector<int> distanceK(TreeNode* root, TreeNode* target, int k) {
+        find(root, target, k);
+        return ans;
     }
 };
