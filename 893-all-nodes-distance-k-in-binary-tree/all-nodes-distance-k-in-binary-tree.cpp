@@ -12,7 +12,7 @@ public:
     vector<int> ans;
     int find(TreeNode* root, TreeNode* target, int k) {
         if (!root)
-            return -1;
+            return 0;
         if (root == target) {
             dfs(root, k);
             return 1;
