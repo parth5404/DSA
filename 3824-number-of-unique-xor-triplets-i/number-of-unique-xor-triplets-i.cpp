@@ -5,10 +5,11 @@ public:
         if (n <= 2) {
             return n;
         }
-        int ans = 1;
-        while (ans <= n) {
-            ans <<= 1;
+        int cnt_bits = 0;
+        while (n != 0) {
+            cnt_bits++;
+            n = n / 2;
         }
-        return ans;
+        return (int)pow(2, cnt_bits);
     }
 };
