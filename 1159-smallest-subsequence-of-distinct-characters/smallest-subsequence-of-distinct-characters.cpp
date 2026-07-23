@@ -2,31 +2,26 @@ class Solution {
 public:
     string smallestSubsequence(string s) {
         vector<int> last(26);
-
-        // Last occurrence of every character
         for (int i = 0; i < s.size(); i++)
             last[s[i] - 'a'] = i;
-
+        stack<char> st;
         vector<bool> inStack(26, false);
-        string st;
-
         for (int i = 0; i < s.size(); i++) {
-            char ch = s[i];
-
-            // if already included then skip
-            if (inStack[ch - 'a'])
+            if (inStack[s[i] - 'a'])
                 continue;
-
-            // remove larger characters from stack if they appear in future
-            while (!st.empty() && st.back() > ch &&last[st.back() - 'a'] > i) {
-                inStack[st.back() - 'a'] = false;
-                st.pop_back();
+            while (!st.empty() && st.top() > s[i] && last[st.top() - 'a'] > i) {
+                inStack[st.top() - 'a'] = 0;
+                st.pop();
             }
-
-            st.push_back(ch);
-            inStack[ch - 'a'] = true;
+            inStack[s[i] - 'a'] = 1;
+            st.push(s[i]);
         }
-
-        return st;
+        string str = "";
+        while (!st.empty()) {
+            str += st.top();
+            st.pop();
+        }
+        reverse(str.begin(),str.end());
+        return str;
     }
 };
