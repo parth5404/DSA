@@ -7,9 +7,9 @@ public:
         unordered_map<int, int> mp;
         while (j < s.length()) {
             mp[s[j]]++;
-            if (mp[s[j]] == 2) {
-                ans = max(ans, j - i + 1);
-            }
+            // if (mp[s[j]] == 2) {
+            //     ans = max(ans, j - i + 1);
+            // }
             while (mp[s[j]] > 2) {
                 mp[s[i]]--;
                 i++;
