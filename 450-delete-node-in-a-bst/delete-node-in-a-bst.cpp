@@ -15,27 +15,24 @@ public:
     TreeNode* deleteNode(TreeNode* root, int key) {
         if (!root)
             return nullptr;
-
-        if (key < root->val) {
-            root->left = deleteNode(root->left, key);
-        } else if (key > root->val) {
-            root->right = deleteNode(root->right, key);
-        } else {
+        if (key > root->val)
+             root->right = deleteNode(root->right, key);
+        else if (key < root->val)
+             root->left = deleteNode(root->left, key);
+        else {
             if (!root->left) {
-                TreeNode* temp = root->right;
-                return temp;
-            } else if (!root->right) {
-                TreeNode* temp = root->left;
-                return temp;
+                return root->right;
             }
-            TreeNode* curr = root->right;
-            while (curr->left) {
-                curr = curr->left;
+            if (!root->right) {
+                return root->left;
+            }
+            TreeNode* curr = root->left;
+            while (curr->right != nullptr) {
+                curr = curr->right;
             }
             root->val = curr->val;
-            root->right = deleteNode(root->right, curr->val);
+            root->left = deleteNode(root->left, root->val);
         }
-
         return root;
     }
 };
