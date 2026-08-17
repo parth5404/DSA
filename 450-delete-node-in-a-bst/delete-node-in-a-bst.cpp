@@ -16,9 +16,9 @@ public:
         if (!root)
             return nullptr;
         if (key > root->val)
-             root->right = deleteNode(root->right, key);
+            root->right = deleteNode(root->right, key);
         else if (key < root->val)
-             root->left = deleteNode(root->left, key);
+            root->left = deleteNode(root->left, key);
         else {
             if (!root->left) {
                 return root->right;
@@ -27,11 +27,17 @@ public:
                 return root->left;
             }
             TreeNode* curr = root->left;
+            TreeNode* par = nullptr;
             while (curr->right != nullptr) {
+                par = curr;
                 curr = curr->right;
             }
             root->val = curr->val;
-            root->left = deleteNode(root->left, root->val);
+            if (par) {
+                par->right = curr->left;
+            } else {
+                root->left = curr->left;
+            }
         }
         return root;
     }
