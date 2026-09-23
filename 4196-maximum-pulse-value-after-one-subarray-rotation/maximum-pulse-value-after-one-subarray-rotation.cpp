@@ -11,17 +11,21 @@ public:
         long long gain = 0;
         long long neg = LLONG_MIN / 4;
         long long evenL = neg, oddL = neg, evenBefore = neg, oddBefore = neg;
+        long long P = 0;
+        long long P_bef = 0;
         for (int r = 0; r < n; r++) {
-            long long before = (r >= 1) ? pre[r - 1] : 0;
+            P += (r % 2 == 0) ? nums[r] : -(long long)nums[r];
+            long long before = P_bef;
             if (r % 2 == 0) {
-                gain = max(gain, 2 * (max(evenL, oddBefore) - pre[r]));
+                gain = max(gain, 2 * (max(evenL, oddBefore) - P));
                 evenBefore = max(before, evenBefore); // odd -> even
-                evenL = max(evenL, pre[r]);
+                evenL = max(evenL, P);
             } else {
-                gain = max(gain, 2 * (max(oddL, evenBefore) - pre[r]));
+                gain = max(gain, 2 * (max(oddL, evenBefore) - P));
                 oddBefore = max(before, oddBefore); // even -> odd
-                oddL = max(oddL, pre[r]);
+                oddL = max(oddL, P);
             }
+            P_bef = P;
         }
         return base + gain;
     }
