@@ -2,12 +2,12 @@ class Solution {
 public:
     long long maxValue(vector<int>& nums) {
         int n = nums.size();
-        vector<long long> pre(n);
-        for (int i = 0; i < n; i++) {
-            long long v = (i % 2 == 0) ? nums[i] : -(long long)nums[i];
-            pre[i] = (i == 0 ? 0 : pre[i - 1]) + v;
-        }
-        long long base = pre[n - 1];
+        // vector<long long> pre(n);
+        // for (int i = 0; i < n; i++) {
+        //     long long v = (i % 2 == 0) ? nums[i] : -(long long)nums[i];
+        //     pre[i] = (i == 0 ? 0 : pre[i - 1]) + v;
+        // }
+        // long long base = pre[n - 1];
         long long gain = 0;
         long long neg = LLONG_MIN / 4;
         long long evenL = neg, oddL = neg, evenBefore = neg, oddBefore = neg;
@@ -27,6 +27,6 @@ public:
             }
             P_bef = P;
         }
-        return base + gain;
+        return P + gain;
     }
 };
